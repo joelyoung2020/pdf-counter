@@ -115,34 +115,34 @@ const arrangeResults = async (firstTen) => {
 
   const result = [
     {
-      1: {word: firstTen[0][0], pageURL: firstURL}
+      1: {word: firstTen[0][0], times: firstTen[0][1], pageURL: firstURL}
     },
     {
-      2: {word: firstTen[1][0], pageURL: secondURL}
+      2: {word: firstTen[1][0], times: firstTen[1][1], pageURL: secondURL}
     },
     {
-      3: {word: firstTen[2][0], pageURL: thirdURL}
+      3: {word: firstTen[2][0], times: firstTen[2][1], pageURL: thirdURL}
     },
     {
-      4: {word: firstTen[3][0], pageURL: fourthURL}
+      4: {word: firstTen[3][0], times: firstTen[3][1], pageURL: fourthURL}
     },
     {
-      5: {word: firstTen[4][0], pageURL: fifthURL}
+      5: {word: firstTen[4][0], times: firstTen[4][1], pageURL: fifthURL}
     },
     {
-      6: {word: firstTen[5][0], pageURL: sixthURL}
+      6: {word: firstTen[5][0], times: firstTen[5][1], pageURL: sixthURL}
     },
     {
-      7: {word: firstTen[6][0], pageURL: seventhURL}
+      7: {word: firstTen[6][0], times: firstTen[6][1], pageURL: seventhURL}
     },
     {
-      8: {word: firstTen[7][0], pageURL: eighthURL}
+      8: {word: firstTen[7][0], times: firstTen[7][1], pageURL: eighthURL}
     },
     {
-      9: {word: firstTen[8][0], pageURL: ninthURL}
+      9: {word: firstTen[8][0], times: firstTen[8][1], pageURL: ninthURL}
     },
     {
-      10: {word: firstTen[9][0], pageURL: tenthURL}
+      10: {word: firstTen[9][0], times: firstTen[9][1], pageURL: tenthURL}
     },
   ]
 
