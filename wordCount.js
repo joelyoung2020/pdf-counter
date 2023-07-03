@@ -1,16 +1,18 @@
-import natural from 'natural';
-const tokenizer = new natural.WordTokenizer();
+ import keyword_extractor from "keyword-extractor";
 import pos from 'pos';
 import { PdfReader } from "pdfreader";
-const pdfPath = './testDocuments/The-Mamba-Mentality-Kobe-Bryant.pdf';
+import fetch from "node-fetch";
 
 
-const processPDF = async () => {
+const processPDF = async (filePath) => {
   try {
-    const extractedText = await extractTextFromPDF(pdfPath);
+    const extractedText = await extractTextFromPDF(filePath);
 
-    const filteredWords = filterUnwantedWords(extractedText)
-    return getMostCounted(filteredWords);
+    // const filteredWords = await filterUnwantedWords(extractedText)
+
+    // const filteredString = filteredWords.join(' ')
+    const keywords = getKeywords(extractedText)
+    return await getMostCounted(keywords);
   } catch (error) {
     console.error('Error:', error);
   }
@@ -30,6 +32,19 @@ const extractTextFromPDF = (pdfPath) => {
     });
   });
 };
+
+const getKeywords = (string) => {
+  const extraction_result =
+  keyword_extractor.extract(string,{
+      language:"english",
+      remove_digits: true,
+      return_changed_case:true,
+      remove_duplicates: false,
+      return_chained_words: false,
+
+  });
+  return extraction_result
+}
 
 
 const filterUnwantedWords = (pdfString) => {
@@ -55,14 +70,10 @@ const filterUnwantedWords = (pdfString) => {
     const tag = taggedWord[1];
 
     if(unwantedTags.includes(tag)) continue;
-     
-    // filter out words that include apostrophe
-    // const splitWord = word.split('')
-    // if (splitWord.includes("'")) {
-    //   const noApostrophe = word.split("'")[0]
-    //   const taggedWord = tagger.tag(noApostrophe)
-    //   console.log(taggedWord)
-    // }
+
+    // filter numbers
+    const isNumber = parseInt(word)
+    if (!isNaN(isNumber)) continue;
 
     wantedWords.push(word)
   }
@@ -70,7 +81,7 @@ const filterUnwantedWords = (pdfString) => {
 }
 
 
-const getMostCounted = (wordArray) => {
+const getMostCounted = async(wordArray) => {
   // Count the occurrences of each word
   const wordFreq = {};
   for (let i = 0; i < wordArray.length; i++) {
@@ -85,26 +96,87 @@ const getMostCounted = (wordArray) => {
   wordFreqArray.sort((a, b) => {
     return b[1] - a[1]
   })
+  const firstTen = wordFreqArray.slice(0, 10)
 
-  const result = `
-    1st: ${wordFreqArray[0][0]},   times: ${wordFreqArray[0][1]}
-    2nd: ${wordFreqArray[1][0]},   times: ${wordFreqArray[1][1]}
-    3rd: ${wordFreqArray[2][0]},   times: ${wordFreqArray[2][1]}
-    4th: ${wordFreqArray[3][0]},   times: ${wordFreqArray[3][1]}
-    5th: ${wordFreqArray[4][0]},   times: ${wordFreqArray[4][1]}
-    6th: ${wordFreqArray[5][0]},   times: ${wordFreqArray[5][1]}
-    7th: ${wordFreqArray[6][0]},   times: ${wordFreqArray[6][1]}
-    8th: ${wordFreqArray[7][0]},   times: ${wordFreqArray[7][1]}
-    9th: ${wordFreqArray[8][0]},   times: ${wordFreqArray[8][1]}
-    10th: ${wordFreqArray[9][0]},   times: ${wordFreqArray[9][1]}
-    11th: ${wordFreqArray[10][0]},   times: ${wordFreqArray[10][1]}
-    12th: ${wordFreqArray[11][0]},   times: ${wordFreqArray[11][1]}
-    13th: ${wordFreqArray[12][0]},   times: ${wordFreqArray[12][1]}
-    14th: ${wordFreqArray[13][0]},   times: ${wordFreqArray[13][1]}
-    15th: ${wordFreqArray[14][0]},   times: ${wordFreqArray[14][1]}
-  `
-
-  console.log(result)
+  return await arrangeResults(firstTen)
 }
 
-processPDF();
+const arrangeResults = async (firstTen) => {
+  const firstURL = await fetchWikipediaPageLink(firstTen[0][0])
+  const secondURL = await fetchWikipediaPageLink(firstTen[1][0])
+  const thirdURL = await fetchWikipediaPageLink(firstTen[2][0])
+  const fourthURL = await fetchWikipediaPageLink(firstTen[3][0])
+  const fifthURL = await fetchWikipediaPageLink(firstTen[4][0])
+  const sixthURL = await fetchWikipediaPageLink(firstTen[5][0])
+  const seventhURL = await fetchWikipediaPageLink(firstTen[6][0])
+  const eighthURL = await fetchWikipediaPageLink(firstTen[7][0])
+  const ninthURL = await fetchWikipediaPageLink(firstTen[8][0])
+  const tenthURL = await fetchWikipediaPageLink(firstTen[9][0])
+
+  const result = [
+    {
+      1: {word: firstTen[0][0], pageURL: firstURL}
+    },
+    {
+      2: {word: firstTen[1][0], pageURL: secondURL}
+    },
+    {
+      3: {word: firstTen[2][0], pageURL: thirdURL}
+    },
+    {
+      4: {word: firstTen[3][0], pageURL: fourthURL}
+    },
+    {
+      5: {word: firstTen[4][0], pageURL: fifthURL}
+    },
+    {
+      6: {word: firstTen[5][0], pageURL: sixthURL}
+    },
+    {
+      7: {word: firstTen[6][0], pageURL: seventhURL}
+    },
+    {
+      8: {word: firstTen[7][0], pageURL: eighthURL}
+    },
+    {
+      9: {word: firstTen[8][0], pageURL: ninthURL}
+    },
+    {
+      10: {word: firstTen[9][0], pageURL: tenthURL}
+    },
+  ]
+
+  return result;
+}
+
+
+// Function to fetch the link to a Wikipedia page
+async function fetchWikipediaPageLink(pageTitle) {
+  const apiUrl = 'https://en.wikipedia.org/w/api.php';
+  const params = new URLSearchParams({
+    action: 'query',
+    format: 'json',
+    prop: 'info',
+    titles: pageTitle,
+    inprop: 'url'
+  });
+  const url = `${apiUrl}?${params.toString()}`;
+
+  try {
+    const response = await fetch(url);
+    const data = await response.json();
+
+    // Extract the page link
+    const pageId = Object.keys(data.query.pages)[0];
+    const pageData = data.query.pages[pageId];
+    const pageUrl = pageData.fullurl;
+
+    return pageUrl;
+  } catch (error) {
+    console.error('Error fetching Wikipedia page link:', error);
+    throw error;
+  }
+}
+
+
+export default processPDF;

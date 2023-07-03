@@ -1,0 +1,9 @@
+POST http://localhost:3000/analyze-pdf
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
+
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="file"; filename="CV_BACKEND"
+Content-Type: application/pdf
+
+< ./testDocuments/CV_BACKEND.pdf
+------WebKitFormBoundary7MA4YWxkTrZu0gW--
